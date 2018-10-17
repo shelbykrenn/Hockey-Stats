@@ -1,0 +1,32 @@
+---
+title: "Shots"
+author: "Shelby Krenn"
+output: html_document
+---
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+library(readxl)
+library(DataComputing)
+shots <- read_excel("rough.xlsx")
+shots$loc_f = factor(shots$loc, levels=c('LL','LC','LR','ML','MC','MR','HL','HC','HR'))
+```
+
+##BY PLAYER
+```{r, fig.width = 8, fig.height = 7, echo = FALSE, warning = FALSE}
+ggplot(data = shots, aes(x = type, fill = loc)) +
+  geom_bar() +
+  facet_wrap(~plr)
+```
+
+##LOCATION FREQUENCY
+```{r, fig.width = 8, fig.height = 7, echo = FALSE, warning = FALSE}
+ggplot(data = shots, aes(x = type, fill = type)) +
+  geom_histogram(stat = "count") +
+  facet_wrap(~loc_f)
+```
+
+##EXPRESSED AS MAP
+```{r pressure, echo=FALSE, out.width = '75%'}
+knitr::include_graphics("Screen Shot 2018-10-17 at 15.31.26.png")
+```
+
