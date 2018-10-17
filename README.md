@@ -1,4 +1,1 @@
-##Hockey Stats
-
-#Analysis of Shot Attempts
-Html found [here](Shots.html)
+Analysis of Shot Attempts HTML can be found [here](Shots.html)
