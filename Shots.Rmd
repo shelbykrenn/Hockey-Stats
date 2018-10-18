@@ -1,6 +1,7 @@
 ---
 title: "Shots"
 author: "Shelby Krenn"
+update: "Last update: 10.17.18"
 output: html_document
 ---
 
@@ -8,25 +9,32 @@ output: html_document
 library(readxl)
 library(DataComputing)
 shots <- read_excel("rough.xlsx")
-shots$loc_f = factor(shots$loc, levels=c('LL','LC','LR','ML','MC','MR','HL','HC','HR'))
+shots$loc_f = factor(shots$loc,
+                     levels=c('LL','LC','LR','ML','MC','MR','HL','HC','HR'))
+shots$type_f = factor(shots$type, 
+                      levels = c('ON','OFF','B', 'G'))
 ```
 
 ##BY PLAYER
 ```{r, fig.width = 8, fig.height = 7, echo = FALSE, warning = FALSE}
-ggplot(data = shots, aes(x = type, fill = loc)) +
+ggplot(data = shots, aes(x = type_f, fill = loc)) +
   geom_bar() +
-  facet_wrap(~plr)
+  facet_wrap(~plr, ncol = 6)
 ```
 
 ##LOCATION FREQUENCY
 ```{r, fig.width = 8, fig.height = 7, echo = FALSE, warning = FALSE}
-ggplot(data = shots, aes(x = type, fill = type)) +
+ggplot(data = shots, aes(x = type_f, fill = type)) +
   geom_histogram(stat = "count") +
   facet_wrap(~loc_f)
 ```
 
 ##EXPRESSED AS MAP
 ```{r pressure, echo=FALSE, out.width = '75%'}
-knitr::include_graphics("Screen Shot 2018-10-17 at 15.31.26.png")
+knitr::include_graphics("Screen Shot 2018-10-17 at 19.59.23.png")
+```
+
+```{r}
+
 ```
 
