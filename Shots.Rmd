@@ -1,7 +1,7 @@
 ---
 title: "Shots"
 author: "Shelby Krenn"
-update: "Last update: 10.17.18"
+update: "Last update: 10.24.18"
 output: html_document
 ---
 
@@ -15,26 +15,22 @@ shots$type_f = factor(shots$type,
                       levels = c('ON','OFF','B', 'G'))
 ```
 
-##BY PLAYER
+#BY PLAYER
 ```{r, fig.width = 8, fig.height = 7, echo = FALSE, warning = FALSE}
 ggplot(data = shots, aes(x = type_f, fill = loc)) +
   geom_bar() +
   facet_wrap(~plr, ncol = 6)
 ```
 
-##LOCATION FREQUENCY
+#LOCATION FREQUENCY
 ```{r, fig.width = 8, fig.height = 7, echo = FALSE, warning = FALSE}
 ggplot(data = shots, aes(x = type_f, fill = type)) +
   geom_histogram(stat = "count") +
   facet_wrap(~loc_f)
 ```
 
-##EXPRESSED AS MAP
-```{r pressure, echo=FALSE, out.width = '75%'}
-knitr::include_graphics("Screen Shot 2018-10-17 at 19.59.23.png")
-```
-
-```{r}
-
+#EXPRESSED AS MAP
+```{r pressure, echo=FALSE, out.width = '85%'}
+knitr::include_graphics("Screen Shot 2018-10-24 at 16.13.56.png")
 ```
 
