@@ -1,7 +1,6 @@
 ---
 title: "Shots"
-author: "Shelby Krenn"
-update: "Last update: 10.24.18"
+author: "Last update: 10.26.18"
 output: html_document
 ---
 
@@ -13,23 +12,71 @@ shots$loc_f = factor(shots$loc,
                      levels=c('LL','LC','LR','ML','MC','MR','HL','HC','HR'))
 shots$type_f = factor(shots$type, 
                       levels = c('ON','OFF','B', 'G'))
+shotcounts <-
+  shots %>%
+  group_by(game, plr) %>%
+  summarise(avg_count = n())
 ```
 
-#BY PLAYER
+#Number of Shot Attempts by Player
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+ggplot(data = shots, 
+       aes(x = reorder(plr,plr))) +
+  ylab("Number of Shots") +
+  xlab("Player") +
+  geom_bar(stat = "count")
+```
+
+#Number of Shot Attempts by Game
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+ggplot(data = shots, 
+       aes(x = game)) +
+  ylab("Number of Shots") +
+  xlab("Game Number") +
+  geom_bar(stat = "count")
+```
+
+#FNS of Shots Attempted by Player
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+ggplot(data = shotcounts, 
+       aes(y = avg_count, 
+           x = reorder(plr, plr))) +
+  ylab("Average Number of Shots") +
+  xlab("Player") +
+  geom_boxplot(aes(group = plr), 
+               outlier.color = "red", 
+               fill = "lightblue", 
+               alpha = 0.5)
+```
+
+#Number of Shot attempts by location
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+ggplot(data = shots, 
+       aes(x = loc_f)) +
+  ylab("Number of Shots") +
+  xlab("Location") +
+  geom_bar(stat = "count")
+```
+
+#Shot Attempts by Player AND Location
 ```{r, fig.width = 8, fig.height = 7, echo = FALSE, warning = FALSE}
 ggplot(data = shots, aes(x = type_f, fill = loc)) +
+  ylab("Number of Shots") +
+  xlab("Type of Shot") +
   geom_bar() +
   facet_wrap(~plr, ncol = 6)
 ```
 
-#LOCATION FREQUENCY
+#Frequency of Shot Type by Location
 ```{r, fig.width = 8, fig.height = 7, echo = FALSE, warning = FALSE}
 ggplot(data = shots, aes(x = type_f, fill = type)) +
-  geom_histogram(stat = "count") +
+  ylab("Number of Shots") +
+  xlab("Type of Shot") +
+  geom_bar(stat = "count") +
   facet_wrap(~loc_f)
 ```
 
-#EXPRESSED AS MAP
+#Frequency of shot type by location (MAP)
 ```{r pressure, echo=FALSE, out.width = '85%'}
 knitr::include_graphics("Screen Shot 2018-10-24 at 16.13.56.png")
 ```
