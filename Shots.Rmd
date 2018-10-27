@@ -1,6 +1,6 @@
 ---
 title: "Shots"
-author: "Last update: 10.26.18"
+author: "Last update: 10.27.18"
 output: html_document
 ---
 
@@ -12,14 +12,21 @@ shots$loc_f = factor(shots$loc,
                      levels=c('LL','LC','LR','ML','MC','MR','HL','HC','HR'))
 shots$type_f = factor(shots$type, 
                       levels = c('ON','OFF','B', 'G'))
+shots$opp_f = factor(shots$opp,
+                     levels = c('Colgate', 'Merrimack', 'Union', 'Providence'))
 shotcounts <-
   shots %>%
   group_by(game, plr) %>%
   summarise(avg_count = n())
+
+shottypecounts <-
+  shots %>%
+  group_by(game, type_f) %>%
+  summarise(avg_count = n())
 ```
 
 #Number of Shot Attempts by Player
-```{r, echo = FALSE, warning = FALSE, message = FALSE}
+```{r, echo = FALSE, warning = FALSE, fig.width = 8, fig.height = 7}
 ggplot(data = shots, 
        aes(x = reorder(plr,plr))) +
   ylab("Number of Shots") +
@@ -27,21 +34,25 @@ ggplot(data = shots,
   geom_bar(stat = "count")
 ```
 
-#Number of Shot Attempts by Game
-```{r, echo = FALSE, warning = FALSE, message = FALSE}
-ggplot(data = shots, 
-       aes(x = game)) +
+#Progression on Shots Attempted by Player
+```{r, echo = FALSE, warning = FALSE, fig.width =8, fig.height = 7}
+ggplot(data = shotcounts, 
+       aes(x = game, 
+           y = avg_count)) +
   ylab("Number of Shots") +
   xlab("Game Number") +
-  geom_bar(stat = "count")
+  geom_point() +
+  facet_wrap(~plr, 
+             ncol = 6) +
+  stat_smooth(method = lm)
 ```
 
 #FNS of Shots Attempted by Player
-```{r, echo = FALSE, warning = FALSE, message = FALSE}
+```{r, echo = FALSE, warning = FALSE, fig.width = 8, fig.height = 7}
 ggplot(data = shotcounts, 
        aes(y = avg_count, 
            x = reorder(plr, plr))) +
-  ylab("Average Number of Shots") +
+  ylab("Number of Shots") +
   xlab("Player") +
   geom_boxplot(aes(group = plr), 
                outlier.color = "red", 
@@ -49,8 +60,26 @@ ggplot(data = shotcounts,
                alpha = 0.5)
 ```
 
+#Number of Shot Attempts by Game
+```{r, echo = FALSE, warning = FALSE, fig.width = 8, fig.height = 7}
+ggplot(data = shots, 
+       aes(x = game)) +
+  ylab("Number of Shots") +
+  xlab("Game Number") +
+  geom_bar(stat = "count")
+```
+
+#Number of Shot Attempts by Opponent
+```{r, echo = FALSE, warning = FALSE, fig.width = 8, fig.height = 7}
+ggplot(data = shots, 
+       aes(x = opp_f)) +
+  ylab("Number of Shots") +
+  xlab("Opponent") +
+  geom_point(stat = "count")
+```
+
 #Number of Shot attempts by location
-```{r, echo = FALSE, warning = FALSE, message = FALSE}
+```{r, echo = FALSE, warning = FALSE, fig.width = 8, fig.height = 7}
 ggplot(data = shots, 
        aes(x = loc_f)) +
   ylab("Number of Shots") +
@@ -60,16 +89,33 @@ ggplot(data = shots,
 
 #Shot Attempts by Player AND Location
 ```{r, fig.width = 8, fig.height = 7, echo = FALSE, warning = FALSE}
-ggplot(data = shots, aes(x = type_f, fill = loc)) +
+ggplot(data = shots, 
+       aes(x = type_f, 
+           fill = loc)) +
   ylab("Number of Shots") +
   xlab("Type of Shot") +
   geom_bar() +
-  facet_wrap(~plr, ncol = 6)
+  facet_wrap(~plr, 
+             ncol = 6)
+```
+
+#FNS of Shot Type by Game
+```{r, echo = FALSE, warning = FALSE, fig.width = 8, fig.height = 7}
+ggplot(data = shottypecounts, 
+       aes(x = type_f, 
+           y = avg_count)) +
+  ylab("Number of Attempts") +
+  xlab("Shot Type") +
+  geom_boxplot(outlier.colour = "red",
+               fill = "lightgreen",
+               alpha = 0.5)
 ```
 
 #Frequency of Shot Type by Location
 ```{r, fig.width = 8, fig.height = 7, echo = FALSE, warning = FALSE}
-ggplot(data = shots, aes(x = type_f, fill = type)) +
+ggplot(data = shots, 
+       aes(x = type_f, 
+           fill = type)) +
   ylab("Number of Shots") +
   xlab("Type of Shot") +
   geom_bar(stat = "count") +
@@ -80,4 +126,6 @@ ggplot(data = shots, aes(x = type_f, fill = type)) +
 ```{r pressure, echo=FALSE, out.width = '85%'}
 knitr::include_graphics("Screen Shot 2018-10-24 at 16.13.56.png")
 ```
+
+
 
