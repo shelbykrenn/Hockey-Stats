@@ -1,6 +1,6 @@
 ---
 title: "Shots"
-author: "Last update: 10.27.18"
+author: "Last update: 10.31.18"
 output: html_document
 ---
 
@@ -8,20 +8,44 @@ output: html_document
 library(readxl)
 library(DataComputing)
 shots <- read_excel("rough.xlsx")
+shots2 <- read_excel("rough2.xlsx")
 shots$loc_f = factor(shots$loc,
-                     levels=c('LL','LC','LR','ML','MC','MR','HL','HC','HR'))
+                     levels=c('LL',
+                              'LC',
+                              'LR',
+                              'ML',
+                              'MC',
+                              'MR',
+                              'HL',
+                              'HC',
+                              'HR'))
 shots$type_f = factor(shots$type, 
-                      levels = c('ON','OFF','B', 'G'))
+                      levels = c('ON',
+                                 'OFF',
+                                 'B', 
+                                 'G'))
 shots$opp_f = factor(shots$opp,
-                     levels = c('Colgate', 'Merrimack', 'Union', 'Providence'))
+                     levels = c('Colgate', 
+                                'Merrimack', 
+                                'Union', 
+                                'Providence', 
+                                'Mercyhurst'))
+shots2$opp_f = factor(shots2$Opp,
+                      levels = c('Colgate', 
+                                'Merrimack', 
+                                'Union', 
+                                'Providence', 
+                                'Mercyhurst'))
 shotcounts <-
   shots %>%
-  group_by(game, plr) %>%
+  group_by(game, 
+           plr) %>%
   summarise(avg_count = n())
 
 shottypecounts <-
   shots %>%
-  group_by(game, type_f) %>%
+  group_by(game, 
+           type_f) %>%
   summarise(avg_count = n())
 ```
 
@@ -71,11 +95,14 @@ ggplot(data = shots,
 
 #Number of Shot Attempts by Opponent
 ```{r, echo = FALSE, warning = FALSE, fig.width = 8, fig.height = 7}
-ggplot(data = shots, 
-       aes(x = opp_f)) +
-  ylab("Number of Shots") +
-  xlab("Opponent") +
-  geom_point(stat = "count")
+ggplot(data = shots2, aes(x = game)) +
+  ylab("Number of Shot Attempts") +
+  xlab("Game Number") +
+  labs(colour = "Team") +
+  geom_point(aes(y = attagainst)) +
+  geom_line(aes(y = attagainst, color = "Opponent")) +
+  geom_point(aes(y = attfor)) + 
+  geom_line(aes(y = attfor, color = "Penn State"))
 ```
 
 #Number of Shot attempts by location
@@ -122,9 +149,12 @@ ggplot(data = shots,
   facet_wrap(~loc_f)
 ```
 
+#Frequency of Goals by Location
+stand by..
+
 #Frequency of shot type by location (MAP)
 ```{r pressure, echo=FALSE, out.width = '85%'}
-knitr::include_graphics("Screen Shot 2018-10-24 at 16.13.56.png")
+knitr::include_graphics("Screen Shot 2018-10-31 at 16.25.15.png")
 ```
 
 
