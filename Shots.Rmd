@@ -7,35 +7,23 @@ output: html_document
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
 library(readxl)
 library(DataComputing)
+library(png)
+rink.png <- readPNG("Screen Shot 2018-11-03 at 17.40.10.png")
 shots <- read_excel("rough.xlsx")
 shots2 <- read_excel("rough2.xlsx")
 shots$loc_f = factor(shots$loc,
-                     levels=c('LL',
-                              'LC',
-                              'LR',
-                              'ML',
-                              'MC',
-                              'MR',
-                              'HL',
-                              'HC',
-                              'HR'))
+                     levels=c('LL', 'LC', 'LR',
+                              'ML', 'MC', 'MR',
+                              'HL', 'HC', 'HR'))
 shots$type_f = factor(shots$type, 
-                      levels = c('ON',
-                                 'OFF',
-                                 'B', 
-                                 'G'))
+                      levels = c('ON', 'OFF',
+                                 'B', 'G'))
 shots$opp_f = factor(shots$opp,
-                     levels = c('Colgate', 
-                                'Merrimack', 
-                                'Union', 
-                                'Providence', 
-                                'Mercyhurst'))
+                     levels = c('Colgate', 'Merrimack', 'Union', 
+                                'Providence', 'Mercyhurst', 'Syracuse'))
 shots2$opp_f = factor(shots2$Opp,
-                      levels = c('Colgate', 
-                                'Merrimack', 
-                                'Union', 
-                                'Providence', 
-                                'Mercyhurst'))
+                      levels = c('Colgate', 'Merrimack', 'Union', 
+                                'Providence', 'Mercyhurst', 'Syracuse'))
 shotcounts <-
   shots %>%
   group_by(game, 
@@ -47,6 +35,54 @@ shottypecounts <-
   group_by(game, 
            type_f) %>%
   summarise(avg_count = n())
+
+typeloc <-
+  shots %>%
+  group_by(type_f,
+           loc_f) %>%
+  summarise(avg_count = n())
+
+typeplr <-
+  shots %>%
+  group_by(type_f,
+           plr) %>%
+  summarise(avg_count = n())
+
+loc <-
+  shots %>%
+  group_by(loc_f) %>%
+  summarise(avg_count = n())
+  loc$total = sum(loc$avg_count)
+  loc$perc = loc$avg_count/loc$total
+
+on <-
+  typeloc[typeloc$type_f == "ON", 1:3]
+  on$total = sum(on$avg_count)
+  on$perc = on$avg_count/on$total
+  
+off <-
+  typeloc[typeloc$type_f == "OFF", 1:3]
+  off$total = sum(off$avg_count)
+  off$perc = off$avg_count/off$total
+  
+blocked <-
+  typeloc[typeloc$type_f == "B", 1:3]
+  blocked$total = sum(blocked$avg_count)
+  blocked$perc = blocked$avg_count/blocked$total
+
+goals <-
+  typeloc[typeloc$type_f == "G", 1:3]
+  newrow <- data.frame(type_f = c("G", "G"), 
+                       loc_f = c("LL", "MR"),
+                       avg_count = as.integer(0, 0))
+  goals <- bind_rows(goals, newrow)
+  goals$total = sum(goals$avg_count)
+  goals$perc = goals$avg_count/goals$total
+  
+goals$loc = factor(goals$loc_f,
+                     levels=c('LL', 'LC', 'LR',
+                              'ML', 'MC', 'MR',
+                              'HL', 'HC', 'HR'))
 ```
 
 #Number of Shot Attempts by Player
@@ -149,12 +185,41 @@ ggplot(data = shots,
   facet_wrap(~loc_f)
 ```
 
-#Frequency of Goals by Location
-stand by..
+#Frequency of Shots by Location
+##Blocked
+```{r, fig.width = 8, fig.height = 7, echo = FALSE, warning = FALSE}
+ggplot(data = blocked,
+       aes(x = type_f, y = total, fill = perc)) +
+  geom_bar(stat = "identity", position = "stack") +
+  facet_wrap(~loc_f) +
+  theme_void()
+```
 
-#Frequency of shot type by location (MAP)
-```{r pressure, echo=FALSE, out.width = '85%'}
-knitr::include_graphics("Screen Shot 2018-10-31 at 16.25.15.png")
+##On net
+```{r, fig.width = 8, fig.height = 7, echo = FALSE, warning = FALSE}
+ggplot(data = on,
+       aes(x = type_f, y = total, fill = perc)) +
+  geom_bar(stat = "identity", position = "stack") +
+  facet_wrap(~loc_f) +
+  theme_void()
+```
+
+##Off net
+```{r, fig.width = 8, fig.height = 7, echo = FALSE, warning = FALSE}
+ggplot(data = off,
+       aes(x = type_f, y = total, fill = perc)) +
+  geom_bar(stat = "identity", position = "stack") +
+  facet_wrap(~loc_f) +
+  theme_void()
+```
+
+##Goals
+```{r, fig.width = 8, fig.height = 7, echo = FALSE, warning = FALSE}
+ggplot(data = goals,
+       aes(x = type_f, y = total, fill = perc)) +
+  geom_bar(stat = "identity", position = "stack") +
+  facet_wrap(~loc) +
+  theme_void()
 ```
 
 
