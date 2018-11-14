@@ -1,14 +1,13 @@
 ---
 title: "Shots"
-author: "Last update: 10.31.18"
+author: "Last update: 11.14.18"
 output: html_document
 ---
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
 library(readxl)
 library(DataComputing)
-library(png)
-rink.png <- readPNG("Screen Shot 2018-11-03 at 17.40.10.png")
+library(plotly)
 shots <- read_excel("rough.xlsx")
 shots2 <- read_excel("rough2.xlsx")
 shots$loc_f = factor(shots$loc,
@@ -33,7 +32,8 @@ shotcounts <-
 shottypecounts <-
   shots %>%
   group_by(game, 
-           type_f) %>%
+           type_f,
+           loc_f) %>%
   summarise(avg_count = n())
 
 typeloc <-
@@ -53,23 +53,27 @@ loc <-
   group_by(loc_f) %>%
   summarise(avg_count = n())
   loc$total = sum(loc$avg_count)
-  loc$perc = loc$avg_count/loc$total
+  loc$prob = loc$avg_count/loc$total
+  loc$perc = loc$prob*100
 
 on <-
   typeloc[typeloc$type_f == "ON", 1:3]
   on$total = sum(on$avg_count)
-  on$perc = on$avg_count/on$total
+  on$prob = on$avg_count/on$total
+  on$perc = on$prob*100
   
 off <-
   typeloc[typeloc$type_f == "OFF", 1:3]
   off$total = sum(off$avg_count)
-  off$perc = off$avg_count/off$total
+  off$prob = off$avg_count/off$total
+  off$perc = off$prob*100
   
 blocked <-
   typeloc[typeloc$type_f == "B", 1:3]
   blocked$total = sum(blocked$avg_count)
-  blocked$perc = blocked$avg_count/blocked$total
-
+  blocked$prob = blocked$avg_count/blocked$total
+  blocked$perc = blocked$prob*100
+  
 goals <-
   typeloc[typeloc$type_f == "G", 1:3]
   newrow <- data.frame(type_f = c("G", "G"), 
@@ -77,7 +81,8 @@ goals <-
                        avg_count = as.integer(0, 0))
   goals <- bind_rows(goals, newrow)
   goals$total = sum(goals$avg_count)
-  goals$perc = goals$avg_count/goals$total
+  goals$prob = goals$avg_count/goals$total
+  goals$perc = goals$prob*100
   
 goals$loc = factor(goals$loc_f,
                      levels=c('LL', 'LC', 'LR',
@@ -109,15 +114,19 @@ ggplot(data = shotcounts,
 
 #FNS of Shots Attempted by Player
 ```{r, echo = FALSE, warning = FALSE, fig.width = 8, fig.height = 7}
-ggplot(data = shotcounts, 
+fnsplr<-
+  ggplot(data = shotcounts, 
        aes(y = avg_count, 
            x = reorder(plr, plr))) +
   ylab("Number of Shots") +
   xlab("Player") +
-  geom_boxplot(aes(group = plr), 
-               outlier.color = "red", 
+  geom_boxplot(aes(group = plr),
                fill = "lightblue", 
                alpha = 0.5)
+
+fnsplr <- ggplotly(fnsplr)
+
+fnsplr
 ```
 
 #Number of Shot Attempts by Game
@@ -129,9 +138,10 @@ ggplot(data = shots,
   geom_bar(stat = "count")
 ```
 
-#Number of Shot Attempts by Opponent
+#Number of Shot Attempts by Possession
+Note: the legend is interactive. Double click to isolate variables.
 ```{r, echo = FALSE, warning = FALSE, fig.width = 8, fig.height = 7}
-ggplot(data = shots2, aes(x = game)) +
+pos <- ggplot(data = shots2, aes(x = game)) +
   ylab("Number of Shot Attempts") +
   xlab("Game Number") +
   labs(colour = "Team") +
@@ -139,6 +149,10 @@ ggplot(data = shots2, aes(x = game)) +
   geom_line(aes(y = attagainst, color = "Opponent")) +
   geom_point(aes(y = attfor)) + 
   geom_line(aes(y = attfor, color = "Penn State"))
+
+pos <- ggplotly(pos)
+
+pos
 ```
 
 #Number of Shot attempts by location
@@ -152,26 +166,28 @@ ggplot(data = shots,
 
 #Shot Attempts by Player AND Location
 ```{r, fig.width = 8, fig.height = 7, echo = FALSE, warning = FALSE}
-ggplot(data = shots, 
-       aes(x = type_f, 
-           fill = loc)) +
+ggplot(data = shots, aes(x = type_f, fill = loc)) +
   ylab("Number of Shots") +
   xlab("Type of Shot") +
   geom_bar() +
-  facet_wrap(~plr, 
-             ncol = 6)
+  facet_wrap(~plr, ncol = 6)
 ```
 
 #FNS of Shot Type by Game
+Note: Outliers indicate strong deviation from most of the data. May not be accurate representation of the bin.
 ```{r, echo = FALSE, warning = FALSE, fig.width = 8, fig.height = 7}
-ggplot(data = shottypecounts, 
+fnsgame <-
+  ggplot(data = shottypecounts, 
        aes(x = type_f, 
            y = avg_count)) +
   ylab("Number of Attempts") +
   xlab("Shot Type") +
-  geom_boxplot(outlier.colour = "red",
-               fill = "lightgreen",
+  geom_boxplot(fill = "lightgreen",
                alpha = 0.5)
+
+fnsgame <- ggplotly(fnsgame)
+
+fnsgame
 ```
 
 #Frequency of Shot Type by Location
@@ -188,39 +204,122 @@ ggplot(data = shots,
 #Frequency of Shots by Location
 ##Blocked
 ```{r, fig.width = 8, fig.height = 7, echo = FALSE, warning = FALSE}
-ggplot(data = blocked,
-       aes(x = type_f, y = total, fill = perc)) +
+b <- 
+  ggplot(data = blocked, aes(x = type_f, y = total, fill = prob, 
+                             text = paste("percent: ", perc, "%", "</br> total ", loc_f, ": ", avg_count))) +
   geom_bar(stat = "identity", position = "stack") +
   facet_wrap(~loc_f) +
   theme_void()
+
+b <- ggplotly(b)
+
+b
 ```
 
 ##On net
 ```{r, fig.width = 8, fig.height = 7, echo = FALSE, warning = FALSE}
-ggplot(data = on,
-       aes(x = type_f, y = total, fill = perc)) +
+on <- 
+  ggplot(data = on, aes(x = type_f, y = total, fill = prob, 
+                        text = paste("percent: ", perc, "%", "</br> total ", loc_f, ": ", avg_count))) +
   geom_bar(stat = "identity", position = "stack") +
   facet_wrap(~loc_f) +
   theme_void()
+
+on <- ggplotly(on)
+
+on
 ```
 
 ##Off net
 ```{r, fig.width = 8, fig.height = 7, echo = FALSE, warning = FALSE}
-ggplot(data = off,
-       aes(x = type_f, y = total, fill = perc)) +
+off <-
+  ggplot(data = off, aes(x = type_f, y = total, fill = prob, 
+                         text = paste("percent: ", perc, "%",
+                                      "</br> total ", loc_f, ": ", avg_count))) +
   geom_bar(stat = "identity", position = "stack") +
   facet_wrap(~loc_f) +
   theme_void()
+
+off <- ggplotly(off)
+
+off
 ```
 
 ##Goals
 ```{r, fig.width = 8, fig.height = 7, echo = FALSE, warning = FALSE}
-ggplot(data = goals,
-       aes(x = type_f, y = total, fill = perc)) +
+g <-
+  ggplot(data = goals, aes(x = type_f, y = total, fill = prob, 
+                           text = paste("percent: ", perc, "%", "</br> total ", loc_f, ": ", avg_count))) +
   geom_bar(stat = "identity", position = "stack") +
   facet_wrap(~loc) +
   theme_void()
+
+g <- ggplotly(g)
+
+g
 ```
 
+```{r, echo = FALSE}
+nelson2 <-
+  shots[shots$plr == "2", 1:8]
 
+madsen5 <-
+  shots[shots$plr == "5", 1:8]
 
+crow7 <-
+  shots[shots$plr == "7", 1:8]
+
+vetter8 <-
+  shots[shots$plr == "8", 1:8]
+
+rolph9 <-
+  shots[shots$plr == "9", 1:8]
+
+welch10 <-
+  shots[shots$plr == "10", 1:8]
+
+fidler12 <-
+  shots[shots$plr == "12", 1:8]
+
+gangarosa13 <-
+  shots[shots$plr == "13", 1:8]
+
+adolfsson15 <-
+  shots[shots$plr == "15", 1:8]
+
+mcmillan16 <-
+  shots[shots$plr == "16", 1:8]
+
+slattery17 <-
+  shots[shots$plr == "17", 1:8]
+
+dobson18 <-
+  shots[shots$plr == "18", 1:8]
+
+rankin19 <-
+  shots[shots$plr == "19", 1:8]
+
+heising20 <-
+  shots[shots$plr == "20", 1:8]
+
+promersberger21 <-
+  shots[shots$plr == "21", 1:8]
+
+villani22 <-
+  shots[shots$plr == "22", 1:8]
+
+rydland23 <-
+  shots[shots$plr == "23", 1:8]
+
+mcleod25 <-
+  shots[shots$plr == "25", 1:8]
+
+meilleur26 <-
+  shots[shots$plr == "26", 1:8]
+
+heminger27 <-
+  shots[shots$plr == "27", 1:8]
+
+forrest28 <-
+  shots[shots$plr == "28", 1:8]
+```
