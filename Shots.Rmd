@@ -1,6 +1,6 @@
 ---
 title: "Shots"
-author: "Last update: 11.14.18"
+author: "Last update: 11.19.18"
 output: html_document
 ---
 
@@ -8,6 +8,7 @@ output: html_document
 library(readxl)
 library(DataComputing)
 library(plotly)
+library(knitr)
 shots <- read_excel("rough.xlsx")
 shots2 <- read_excel("rough2.xlsx")
 shots$loc_f = factor(shots$loc,
@@ -19,10 +20,12 @@ shots$type_f = factor(shots$type,
                                  'B', 'G'))
 shots$opp_f = factor(shots$opp,
                      levels = c('Colgate', 'Merrimack', 'Union', 
-                                'Providence', 'Mercyhurst', 'Syracuse'))
+                                'Providence', 'Mercyhurst', 'Syracuse',
+                                'RPI'))
 shots2$opp_f = factor(shots2$Opp,
                       levels = c('Colgate', 'Merrimack', 'Union', 
-                                'Providence', 'Mercyhurst', 'Syracuse'))
+                                'Providence', 'Mercyhurst', 'Syracuse',
+                                'RPI'))
 shotcounts <-
   shots %>%
   group_by(game, 
@@ -76,8 +79,8 @@ blocked <-
   
 goals <-
   typeloc[typeloc$type_f == "G", 1:3]
-  newrow <- data.frame(type_f = c("G", "G"), 
-                       loc_f = c("LL", "MR"),
+  newrow <- data.frame(type_f = c("G"), 
+                       loc_f = c("MR"),
                        avg_count = as.integer(0, 0))
   goals <- bind_rows(goals, newrow)
   goals$total = sum(goals$avg_count)
@@ -114,7 +117,7 @@ ggplot(data = shotcounts,
 
 #FNS of Shots Attempted by Player
 ```{r, echo = FALSE, warning = FALSE, fig.width = 8, fig.height = 7}
-fnsplr<-
+fnsplr <-
   ggplot(data = shotcounts, 
        aes(y = avg_count, 
            x = reorder(plr, plr))) +
