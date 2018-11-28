@@ -35,8 +35,7 @@ shotcounts <-
 shottypecounts <-
   shots %>%
   group_by(game, 
-           type_f,
-           loc_f) %>%
+           type_f) %>%
   summarise(avg_count = n())
 
 typeloc <-
@@ -79,10 +78,6 @@ blocked <-
   
 goals <-
   typeloc[typeloc$type_f == "G", 1:3]
-  newrow <- data.frame(type_f = c("G"), 
-                       loc_f = c("MR"),
-                       avg_count = as.integer(0, 0))
-  goals <- bind_rows(goals, newrow)
   goals$total = sum(goals$avg_count)
   goals$prob = goals$avg_count/goals$total
   goals$perc = goals$prob*100
@@ -91,6 +86,11 @@ goals$loc = factor(goals$loc_f,
                      levels=c('LL', 'LC', 'LR',
                               'ML', 'MC', 'MR',
                               'HL', 'HC', 'HR'))
+
+strengthshots <-
+  shots %>%
+  group_by(type_f, strength) %>%
+  summarise(avg_count = n())
 ```
 
 #Number of Shot Attempts by Player
@@ -158,15 +158,6 @@ pos <- ggplotly(pos)
 pos
 ```
 
-#Number of Shot attempts by location
-```{r, echo = FALSE, warning = FALSE, fig.width = 8, fig.height = 7}
-ggplot(data = shots, 
-       aes(x = loc_f)) +
-  ylab("Number of Shots") +
-  xlab("Location") +
-  geom_bar(stat = "count")
-```
-
 #Shot Attempts by Player AND Location
 ```{r, fig.width = 8, fig.height = 7, echo = FALSE, warning = FALSE}
 ggplot(data = shots, aes(x = type_f, fill = loc)) +
@@ -177,7 +168,6 @@ ggplot(data = shots, aes(x = type_f, fill = loc)) +
 ```
 
 #FNS of Shot Type by Game
-Note: Outliers indicate strong deviation from most of the data. May not be accurate representation of the bin.
 ```{r, echo = FALSE, warning = FALSE, fig.width = 8, fig.height = 7}
 fnsgame <-
   ggplot(data = shottypecounts, 
@@ -193,6 +183,7 @@ fnsgame <- ggplotly(fnsgame)
 fnsgame
 ```
 
+
 #Frequency of Shot Type by Location
 ```{r, fig.width = 8, fig.height = 7, echo = FALSE, warning = FALSE}
 ggplot(data = shots, 
@@ -205,6 +196,21 @@ ggplot(data = shots,
 ```
 
 #Frequency of Shots by Location
+##Overall
+```{r, echo = FALSE, warning = FALSE, fig.width = 8, fig.height = 7}
+all <- 
+  ggplot(data = loc, aes(x = total, y = total, fill = prob,
+                        text = paste('percent: ', perc, '%',
+                                     '</br> total ', loc_f, ': ', avg_count))) +
+  geom_bar(stat = 'identity', position = 'stack') +
+  facet_wrap(~loc_f) +
+  theme_void()
+
+all <- ggplotly(all)
+
+all
+```
+
 ##Blocked
 ```{r, fig.width = 8, fig.height = 7, echo = FALSE, warning = FALSE}
 b <- 
@@ -222,9 +228,10 @@ b
 ##On net
 ```{r, fig.width = 8, fig.height = 7, echo = FALSE, warning = FALSE}
 on <- 
-  ggplot(data = on, aes(x = type_f, y = total, fill = prob, 
-                        text = paste("percent: ", perc, "%", "</br> total ", loc_f, ": ", avg_count))) +
-  geom_bar(stat = "identity", position = "stack") +
+  ggplot(data = on, aes(x = type_f, y = total, fill = prob,
+                        text = paste('percent: ', perc, '%',
+                                     '</br> total ', loc_f, ': ', avg_count))) +
+  geom_bar(stat = 'identity', position = 'stack') +
   facet_wrap(~loc_f) +
   theme_void()
 
