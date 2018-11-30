@@ -1,34 +1,90 @@
 ---
 title: "Faceoffs"
-author: "Last update: 11.19.18"
+author: "Last update: 11.30.18"
 output: html_document
 ---
-Note: Current data is only from Game 1. 
+Note: Current data is only THROUGH GAME 11. 
 ```{r, echo =FALSE, warning=FALSE, message=FALSE}
 library(readxl)
 library(DataComputing)
+library(plotly)
 
 faceoffs <- read_excel('ROUGH3.xlsx')
 
-winsr <- 
+faceoffs$soi_f = factor(faceoffs$soi,
+                        levels = c("L", "C", "R"))
+
+res <- 
   faceoffs %>%
   group_by(game, res, plr) %>%
   summarise(avg_count = n())
 
-winsp <-
+poss <-
   faceoffs %>%
   group_by(game, poss, plr) %>%
   summarise(avg_count = n())
+
+winsr <-
+  res[res$res == "W", 1:4]
+
+lossesr <-
+  res[res$res == "L", 1:4]
+
+winsp <-
+  poss[poss$poss == "W", 1:4]
+
+lossesp <-
+  poss[poss$poss == "L", 1:4]
+
+soires <-
+  faceoffs %>%
+  group_by(res, soi_f, plr) %>%
+  summarise((avg_count = n()))
 ```
 
-#Number of Faceoffs Attempted by Player
+#Possession Success Rate by Player
 ```{r, echo =FALSE, warning=FALSE, message=FALSE}
-ggplot(data = faceoffs, aes(x = reorder(plr, plr))) +
+ggplot(data = faceoffs, aes(x = reorder(plr, plr), fill = poss)) +
   geom_bar(stat = 'count')
 ```
 
-```{r, echo =FALSE, warning=FALSE, message=FALSE}
-ggplot(data = winsp, aes(x = poss, y = avg_count)) +
+#Possession Success Rate by Game
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+ggplot(data = faceoffs, aes(x = game, fill = poss)) +
+  geom_bar(stat = 'count')
+```
+
+#Progression of Faceoffs Won by Game and Player
+```{r, echo = FALSE, warning = FALSE, fig.width =8, fig.height = 7}
+ggplot(data = winsr, 
+       aes(x = game, 
+           y = avg_count)) +
   geom_point() +
-  facet_wrap(~plr)
+  facet_wrap(~plr, ncol = 5) +
+  stat_smooth(method = lm)
+```
+
+#Progression of Faceoffs Lost by Game and Player
+```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.height = 7, fig.width = 8}
+ggplot(data = lossesr,
+       aes(x= game, y = avg_count)) +
+  geom_point() +
+  facet_wrap(~plr, ncol = 5) +
+  stat_smooth(method = lm)
+```
+
+#Faceoff Result Success by Zone and Player
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.height = 7, fig.width = 8}
+ggplot(data = faceoffs,
+       aes(x = zone, fill = res)) +
+  geom_histogram(stat = 'count') +
+  facet_wrap(~plr, ncol = 5)
+```
+
+#Faceoff Ressult by Side of Ice and Player
+```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.height = 7, fig.width = 8}
+ggplot(data = faceoffs,
+       aes(x = soi_f, fill = res)) +
+  geom_bar(stat = 'count') +
+  facet_wrap(~plr, ncol = 5)
 ```
