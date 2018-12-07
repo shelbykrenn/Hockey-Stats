@@ -1,6 +1,6 @@
 ---
 title: "Shots"
-author: "Last update: 11.30.18"
+author: "Last update: 12.07.18"
 output: html_document
 ---
 
@@ -34,9 +34,13 @@ shotcounts <-
 
 shottypecounts <-
   shots %>%
-  group_by(game, 
+  group_by(game,
+           plr,
            type_f) %>%
   summarise(avg_count = n())
+
+onnetcounts <-
+  shottypecounts[shottypecounts$type_f == 'ON', 1:4]
 
 typeloc <-
   shots %>%
@@ -109,6 +113,19 @@ ggplot(data = shotcounts,
            y = avg_count)) +
   ylab("Number of Shots") +
   xlab("Game Number") +
+  geom_point() +
+  facet_wrap(~plr, 
+             ncol = 6) +
+  stat_smooth(method = lm)
+```
+
+#Progression of Shots ON NET by Player and Game
+```{r, echo = FALSE, warning = FALSE, fig.width = 8, fig.height = 7}
+ggplot(data = onnetcounts,
+       aes(x = game,
+           y = avg_count)) +
+  ylab('Number of Shots On Net') +
+  xlab('Game Number') +
   geom_point() +
   facet_wrap(~plr, 
              ncol = 6) +
