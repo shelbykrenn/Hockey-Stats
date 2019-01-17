@@ -1,7 +1,9 @@
 ---
 title: "Shots"
-author: "Last update: 01.06.19"
-output: html_document
+author: 'Last update: 01.17.19'
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
@@ -21,11 +23,11 @@ shots$type_f = factor(shots$type,
 shots$opp_f = factor(shots$opp,
                      levels = c('Colgate', 'Merrimack', 'Union', 
                                 'Providence', 'Mercyhurst', 'Syracuse',
-                                'RPI', 'RMU', 'Boston'))
+                                'RPI', 'RMU', 'Boston', 'Cornell'))
 shots2$opp_f = factor(shots2$Opp,
                       levels = c('Colgate', 'Merrimack', 'Union', 
                                 'Providence', 'Mercyhurst', 'Syracuse',
-                                'RPI', 'RMU', 'Boston'))
+                                'RPI', 'RMU', 'Boston', 'Cornell'))
 shotcounts <-
   shots %>%
   group_by(game, 
@@ -155,11 +157,11 @@ ggplot(data = shots,
        aes(x = game)) +
   ylab("Number of Shots") +
   xlab("Game Number") +
-  geom_bar(stat = "count")
+  geom_bar(stat = "count", colour = 'lightgray', alpha = 0.4) +
+  geom_line(stat = 'count', color = 'red', size = 2)
 ```
 
-#Number of Shot Attempts by Possession
-Note: the legend is interactive. Double click to isolate variables.
+# Number of Shot Attempts by Possession
 ```{r, echo = FALSE, warning = FALSE, fig.width = 8, fig.height = 7}
 pos <- ggplot(data = shots2, aes(x = game)) +
   ylab("Number of Shot Attempts") +
@@ -174,6 +176,24 @@ pos <- ggplotly(pos)
 
 pos
 ```
+
+# Number of Shot Attempts by Position and Game Result
+```{r, echo = FALSE, warning = FALSE, fig.width = 8, fig.height = 7}
+posres <- 
+  ggplot(data = shots2, aes(x = game)) +
+  ylab('Number of Shot Attempts') +
+  xlab('Game Number') +
+  geom_point(aes(y = attfor)) +
+  geom_point(aes(y = attagainst)) +
+  geom_line(aes(y = attfor), colour = 'blue') +
+  geom_line(aes(y = attagainst), colour = 'red') +
+  facet_wrap(~ result)
+
+posres <- ggplotly(posres)
+
+posres
+```
+
 
 #Shot Attempts by Player AND Location
 ```{r, fig.width = 8, fig.height = 7, echo = FALSE, warning = FALSE}
