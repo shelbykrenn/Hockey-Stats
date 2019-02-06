@@ -1,9 +1,9 @@
 ---
 title: "Faceoffs"
-author: "Last update: 11.30.18"
+author: "Last update: 02.06.19"
 output: html_document
 ---
-Note: Current data is only THROUGH GAME 11. 
+Note: Current data is only THROUGH GAME 14. 
 ```{r, echo =FALSE, warning=FALSE, message=FALSE}
 library(readxl)
 library(DataComputing)
@@ -73,18 +73,28 @@ ggplot(data = lossesr,
   stat_smooth(method = lm)
 ```
 
-#Faceoff Result Success by Zone and Player
+# Five Number Summary of Odds of Possession
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.height = 7, fig.width = 8}
-ggplot(data = faceoffs,
-       aes(x = zone, fill = res)) +
-  geom_histogram(stat = 'count') +
-  facet_wrap(~plr, ncol = 5)
+crutial19 <-
+  filter(poss, plr == '19')
+crutial10 <-
+  filter(poss, plr == '10')
+
+crutial <-
+  full_join(crutial19, crutial10) %>%
+  mutate(plr = as.character(plr))
+
+crutial %>%
+  ggplot(aes(x = plr, y = avg_count, fill = plr)) +
+  geom_boxplot() +
+  facet_grid(~ poss) +
+  xlab('Player') +
+  ylab('Amount of Faceoffs')
 ```
 
-#Faceoff Ressult by Side of Ice and Player
-```{r, echo = FALSE, warning = FALSE, message = FALSE, fig.height = 7, fig.width = 8}
-ggplot(data = faceoffs,
-       aes(x = soi_f, fill = res)) +
-  geom_bar(stat = 'count') +
-  facet_wrap(~plr, ncol = 5)
+```{r}
+crutial19 %>%
+  ggplot(aes(x = avg_count, y = game)) +
+  geom_density()
 ```
+

@@ -23,11 +23,13 @@ shots$type_f = factor(shots$type,
 shots$opp_f = factor(shots$opp,
                      levels = c('Colgate', 'Merrimack', 'Union', 
                                 'Providence', 'Mercyhurst', 'Syracuse',
-                                'RPI', 'RMU', 'Boston', 'Cornell'))
+                                'RPI', 'RMU', 'Boston', 'Cornell', 
+                                'Lindenwood'))
 shots2$opp_f = factor(shots2$Opp,
                       levels = c('Colgate', 'Merrimack', 'Union', 
                                 'Providence', 'Mercyhurst', 'Syracuse',
-                                'RPI', 'RMU', 'Boston', 'Cornell'))
+                                'RPI', 'RMU', 'Boston', 'Cornell',
+                                'Lindenwood'))
 shotcounts <-
   shots %>%
   group_by(game, 
@@ -204,23 +206,6 @@ ggplot(data = shots, aes(x = type_f, fill = loc)) +
   facet_wrap(~plr, ncol = 6)
 ```
 
-#FNS of Shot Type by Game
-```{r, echo = FALSE, warning = FALSE, fig.width = 8, fig.height = 7}
-fnsgame <-
-  ggplot(data = shottypecounts, 
-       aes(x = type_f, 
-           y = avg_count)) +
-  ylab("Number of Attempts") +
-  xlab("Shot Type") +
-  geom_boxplot(fill = "lightgreen",
-               alpha = 0.5)
-
-fnsgame <- ggplotly(fnsgame)
-
-fnsgame
-```
-
-
 #Frequency of Shot Type by Location
 ```{r, fig.width = 8, fig.height = 7, echo = FALSE, warning = FALSE}
 ggplot(data = shots, 
@@ -304,69 +289,4 @@ g <-
 g <- ggplotly(g)
 
 g
-```
-
-```{r, echo = FALSE}
-nelson2 <-
-  shots[shots$plr == "2", 1:8]
-
-madsen5 <-
-  shots[shots$plr == "5", 1:8]
-
-crow7 <-
-  shots[shots$plr == "7", 1:8]
-
-vetter8 <-
-  shots[shots$plr == "8", 1:8]
-
-rolph9 <-
-  shots[shots$plr == "9", 1:8]
-
-welch10 <-
-  shots[shots$plr == "10", 1:8]
-
-fidler12 <-
-  shots[shots$plr == "12", 1:8]
-
-gangarosa13 <-
-  shots[shots$plr == "13", 1:8]
-
-adolfsson15 <-
-  shots[shots$plr == "15", 1:8]
-
-mcmillan16 <-
-  shots[shots$plr == "16", 1:8]
-
-slattery17 <-
-  shots[shots$plr == "17", 1:8]
-
-dobson18 <-
-  shots[shots$plr == "18", 1:8]
-
-rankin19 <-
-  shots[shots$plr == "19", 1:8]
-
-heising20 <-
-  shots[shots$plr == "20", 1:8]
-
-promersberger21 <-
-  shots[shots$plr == "21", 1:8]
-
-villani22 <-
-  shots[shots$plr == "22", 1:8]
-
-rydland23 <-
-  shots[shots$plr == "23", 1:8]
-
-mcleod25 <-
-  shots[shots$plr == "25", 1:8]
-
-meilleur26 <-
-  shots[shots$plr == "26", 1:8]
-
-heminger27 <-
-  shots[shots$plr == "27", 1:8]
-
-forrest28 <-
-  shots[shots$plr == "28", 1:8]
 ```
