@@ -1,6 +1,6 @@
 ---
 title: "Shots"
-author: 'Last update: 01.17.19'
+author: 'Last update: 02.27.19'
 output:
   html_document: default
   pdf_document: default
@@ -24,12 +24,14 @@ shots$opp_f = factor(shots$opp,
                      levels = c('Colgate', 'Merrimack', 'Union', 
                                 'Providence', 'Mercyhurst', 'Syracuse',
                                 'RPI', 'RMU', 'Boston', 'Cornell', 
-                                'Lindenwood'))
+                                'Lindenwood', 'Syracuse*', 'Princeton',
+                                'RMU*'))
 shots2$opp_f = factor(shots2$Opp,
                       levels = c('Colgate', 'Merrimack', 'Union', 
                                 'Providence', 'Mercyhurst', 'Syracuse',
                                 'RPI', 'RMU', 'Boston', 'Cornell',
-                                'Lindenwood'))
+                                'Lindenwood', 'Syracuse*', 'Princeton',
+                                'RMU*'))
 shotcounts <-
   shots %>%
   group_by(game, 
